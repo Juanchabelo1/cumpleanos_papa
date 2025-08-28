@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Feliz Cumpleaños — Regalo</title>
+  <style>
+    /* ---------- RESET & BASE ---------- */
+    :root{
+      --accent:#214eac; /* azul oscuro */
+      --accent-2:#4b6bd6; /* azul claro secundario */
+      --bg-1:#f3f7ff; /* fondo sutil azul */
+      --card:#ffffff;
+      --muted:#556
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;}
+    body{
+      margin:0;
+      font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      background: linear-gradient(180deg,var(--bg-1), #ffffff);
+      color:#111;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:20px;
+      padding:18px 10px 40px;
+    }
+
+    /* ---------- HEADER ---------- */
+    header{
+      width:100%;
+      max-width:1100px;
+      background:linear-gradient(90deg,var(--accent), var(--accent-2));
+      color:white;
+      padding:18px 20px;
+      border-radius:14px;
+      box-shadow:0 10px 30px rgba(33,78,172,0.14);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .brand{
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .logo{
+      width:56px;height:56px;border-radius:12px;background:rgba(255,255,255,0.09);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:22px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.12);
+    }
+    /* Typewriter title */
+    .title-wrap{
+      overflow:hidden;
+      white-space:nowrap;
+      border-right:3px solid rgba(255,255,255,0.28);
+      width:24ch; /* control typing length */
+      animation: typing 3s steps(24), blink 0.8s step-end infinite alternate;
+    }
+    @keyframes typing{from{width:0} to{width:24ch}}
+    @keyframes blink{50%{border-color:transparent} 100%{border-color:rgba(255,255,255,0.28)}}
+
+    /* ---------- MUTE BUTTON (top-left) ---------- */
+    .mute-btn{
+      position:fixed; left:14px; top:14px; z-index:9999;
+      width:56px; height:56px; border-radius:12px; display:flex;align-items:center;justify-content:center;
+      background:linear-gradient(180deg,white, #f3f7ff); box-shadow:0 10px 30px rgba(33,78,172,0.08); cursor:pointer;
+      transition:transform 200ms ease;
+      animation:pulse 2.2s infinite;
+    }
+    .mute-btn:hover{transform:translateY(-5px)}
+    @keyframes pulse{0%{box-shadow:0 6px 18px rgba(33,78,172,0.08)}50%{box-shadow:0 14px 30px rgba(75,107,214,0.08)}100%{box-shadow:0 6px 18px rgba(33,78,172,0.08)}}
+    .mute-btn .icon{font-size:20px}
+
+    /* ---------- CAROUSEL ---------- */
+    .carousel{
+      width:100%; max-width:980px; min-height:420px; background:transparent; position:relative; border-radius:16px; overflow:visible;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .slides{
+      width:100%; height:100%; position:relative; overflow:visible;
+      display:flex; align-items:center; justify-content:center;
+    }
+    .slide{
+      position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:12px; padding:26px;
+      opacity:0; transform:translateY(12px) scale(0.98); transition:opacity .7s cubic-bezier(.2,.9,.2,1), transform .7s cubic-bezier(.2,.9,.2,1); pointer-events:none;
+    }
+    .slide.active{opacity:1; transform:translateY(0) scale(1); pointer-events:auto}
+
+    .photo-wrap{
+      width:100%; display:flex; align-items:center; justify-content:center;
+    }
+    .photo{
+      max-width:84%; max-height:360px; width:auto; height:auto; border-radius:16px; box-shadow:0 20px 48px rgba(0,0,0,0.14);
+      border:8px solid rgba(255,255,255,0.92);
+      background:linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.2));
+      transition:transform .8s cubic-bezier(.2,.9,.2,1), box-shadow .3s ease;
+    }
+    .slide.active .photo{transform:translateY(-6px) rotate(-0.3deg)}
+
+    .slide-title{
+      font-size:1.6rem; font-weight:700; letter-spacing:0.4px; margin-top:6px; transform-origin:left center; animation:fadeUp .6s ease;
+    }
+    .slide-desc{max-width:78%; color:var(--muted); font-size:1rem}
+    @keyframes fadeUp{from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:translateY(0)}}
+
+    /* dots */
+    .dots{display:flex; gap:8px; margin-top:6px}
+    .dot{width:10px;height:10px;border-radius:50%;background:rgba(0,0,0,0.12);cursor:pointer;transition:transform .18s}
+    .dot.active{background:var(--accent); transform:scale(1.15)}
+
+    /* arrows */
+    .arrow{
+      position:absolute; top:50%; transform:translateY(-50%); width:56px; height:56px; border-radius:12px; display:flex;align-items:center;justify-content:center; cursor:pointer;
+      background:linear-gradient(180deg, rgba(255,255,255,0.95), rgba(243,247,255,0.95)); box-shadow:0 12px 30px rgba(33,78,172,0.08); transition:transform .16s ease, box-shadow .16s ease; z-index:50;
+    }
+    .arrow:hover{transform:translateY(-50%) scale(1.05); box-shadow:0 20px 40px rgba(33,78,172,0.12)}
+    .arrow.left{left:6px}
+    .arrow.right{right:6px}
+    .arrow svg{width:22px; height:22px; display:block}
+
+    /* gift box for last slide */
+    .gift-box{
+      width:120px;height:120px;border-radius:12px;background:linear-gradient(180deg,var(--accent-2), var(--accent)); display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer;box-shadow:0 12px 30px rgba(0,0,0,0.18);
+      transform-origin:center; transition:transform .28s ease;
+    }
+    .gift-box:hover{transform:translateY(-8px) rotate(-2deg)}
+    .ribbon{position:absolute; top:10px; left:50%; transform:translateX(-50%); width:80%; height:22px; background:rgba(255,255,255,0.9); border-radius:6px}
+    .ribbon:after{content:'';position:absolute; left:50%; transform:translateX(-50%); top:18px; width:24px;height:24px;background:rgba(255,255,255,0.95); border-radius:4px}
+    .gift-label{color:white;font-weight:700; text-shadow:0 2px 6px rgba(0,0,0,0.22)}
+
+    /* modal present reveal */
+    .modal{
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.55)); z-index:99999;
+    }
+    .modal.show{display:flex}
+    .present{
+      width:min(880px,92%); max-height:90%; background:var(--card); border-radius:18px; padding:18px; box-shadow:0 40px 80px rgba(0,0,0,0.48); position:relative; overflow:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px;
+      transform:scale(.8) translateY(18px); opacity:0; transition:transform .6s cubic-bezier(.2,.95,.2,1), opacity .6s ease;
+    }
+    .modal.show .present{transform:scale(1) translateY(0); opacity:1}
+    .final-img{max-width:88%; max-height:68vh; border-radius:12px; box-shadow:0 14px 40px rgba(0,0,0,0.3)}
+    .greeting{font-size:2rem; font-weight:800; color:var(--accent); text-shadow:0 6px 18px rgba(33,78,172,0.12)}
+    .close-btn{position:absolute; right:12px; top:10px; background:transparent; border:0; font-size:22px; cursor:pointer}
+
+    /* footer */
+    footer{width:100%; max-width:1100px; text-align:center; color:var(--muted); padding:12px 18px; margin-top:6px}
+
+    /* responsive */
+    @media (max-width:900px){
+      .arrow{width:48px;height:48px}
+    }
+    @media (max-width:700px){
+      .title-wrap{width:20ch}
+      header{padding:14px}
+      .slide-desc{max-width:94%}
+      .photo{max-width:94%; max-height:260px; border-radius:12px}
+      .logo{width:48px;height:48px}
+      .title-wrap{font-size:16px}
+      .arrow{width:52px;height:52px}
+      .arrow.left{left:4px}
+      .arrow.right{right:4px}
+      .mute-btn{width:48px;height:48px; left:8px; top:8px}
+    }
+
+    /* extra small phones (e.g., Xiaomi Note 10) */
+    @media (max-width:420px){
+      body{padding:12px 6px 36px}
+      header{border-radius:12px}
+      .slide-title{font-size:1.2rem}
+      .greeting{font-size:1.6rem}
+      .photo{max-height:220px}
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- MUTE BUTTON -->
+  <button class="mute-btn" id="muteBtn" aria-label="Silenciar música">
+    <span class="icon" id="muteIcon">🔈</span>
+  </button>
+
+  <!-- HEADER -->
+  <header>
+    <div class="brand">
+      <div class="logo">🎁</div>
+      <div>
+        <div class="title-wrap">Feliz cumpleaños, Papá</div>
+        <div style="font-size:12px; opacity:.95">Un regalo hecho con cariño</div>
+      </div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-weight:700; font-size:20px">Para: Fernando</div>
+      <div style="font-size:12px; opacity:.9">Con todo nuestro amor</div>
+    </div>
+  </header>
+
+  <!-- CAROUSEL -->
+  <section class="carousel" aria-label="Galería de fotos">
+
+    <!-- arrows -->
+    <button class="arrow left" id="prevBtn" aria-label="Anterior">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M15 18L9 12L15 6" stroke="rgba(33,78,172,0.9)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button class="arrow right" id="nextBtn" aria-label="Siguiente">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 6L15 12L9 18" stroke="rgba(33,78,172,0.9)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+
+    <div class="slides" id="slides">
+      <!-- 10 slides: reemplaza las rutas photo1.jpg ... photo10.jpg en /images -->
+
+      <div class="slide active" data-index="0">
+        <div class="slide-title">¿Quien es?</div>
+        <div class="photo-wrap"><img class="photo" src="images/photo1.jpg" alt="Foto 1"></div>
+        <div class="slide-desc">Él es Luis Fernando Cetares Laguna, actualmente tiene 55 años.</div>
+      </div>
+
+      <div class="slide" data-index="1">
+        <div class="slide-title">Es una Buena Persona</div>
+        <div class="photo-wrap"><img class="photo" src="images/photo2.jpg" alt="Foto 2"></div>
+        <div class="slide-desc">Es un hombre de buen corazón que siempre se preocupa por los demas,
+          a veces más que si mismo.
+        </div>
+      </div>
+
+      <div class="slide" data-index="2">
+        <div class="slide-title">Es un Gran padre</div>
+        <div class="photo-wrap"><img class="photo" src="images/photo3.jpg" alt="Foto 3"></div>
+        <div class="slide-desc">Probablemente la segunda persona que vieron en este mundo sus hijos (ó quizas la tercera despues del doctor 😅),
+          y desde entonces ha estado con ellos siempre que lo necesitan.
+        </div>
+      </div>
+
+      <div class="slide" data-index="3">
+        <div class="slide-title">Es un Esposo Cariñoso</div>
+        <div class="photo-wrap"><img class="photo" src="images/photo4.jpg" alt="Foto 4"></div>
+        <div class="slide-desc">3 veces distintas le costo invitar a la mujer de su vida a una cita,
+          y desde entonces ha sido una montaña rusa de emociones que ha durado hasta hoy.
+        </div>
+      </div>
+
+      <div class="slide" data-index="4">
+        <div class="slide-title">Es un Mentor Sabio</div>
+        <div class="photo-wrap"><img class="photo" src="images/photo5.jpg" alt="Foto 5"></div>
+        <div class="slide-desc">En mi cabeza resuenan las pequeñas conversaciones y los grandes consejos que nos has dado en cada instante de nuestras
+           vidas, aún los guardo en mi memoria.</div>
+      </div>
+
+      <div class="slide" data-index="5">
+        <div class="slide-title">Es un Viajero Curioso</div>
+        <div class="photo-wrap"><img class="photo" src="images/photo6.jpg" alt="Foto 6"></div>
+        <div class="slide-desc">Siempre tiene un espiritu por conocer nuevos lugares, y desea compartir esas experiencias al lado de su familia y amigos.</div>
+      </div>
+
+      <div class="slide" data-index="6">
+        <div class="slide-title">Es un Hijo Ejemplar</div>
+        <div class="photo-wrap"><img class="photo" src="images/photo7.jpg" alt="Foto 7"></div>
+        <div class="slide-desc">Se siente orgulloso de sus padres, siempre los acompaña y vela por su bienestar
+          cada que puede.
+        </div>
+      </div>
+
+      <div class="slide" data-index="7">
+        <div class="slide-title">Es un Hermano de Corazón </div>
+        <div class="photo-wrap"><img class="photo" src="images/photo8.jpg" alt="Foto 8"></div>
+        <div class="slide-desc">Creció y vivio experiencias con todos ellos, tienen un lazo más allá
+          de la sangre que perdura hasta nuestros días.
+        </div>
+      </div>
+
+      <div class="slide" data-index="8">
+        <div class="slide-title">Él es Luis Fernando Cetares Ruiz</div>
+        <div class="photo-wrap"><img class="photo" src="images/photo9.jpg" alt="Foto 9"></div>
+        <div class="slide-desc">Un padre, un esposo, un mentor, un viajero, un hijo, 
+          un hermano, un amigo ... y un Gran Ser Humano.
+        </div>
+      </div>
+
+      <!-- Última slide: regalo interactivo -->
+      <div class="slide" data-index="9">
+        <div class="slide-title">Sorpresa final 🎁</div>
+        <div class="photo-wrap">
+          <div class="gift-box" id="giftBtn" role="button" aria-label="Abrir regalo">
+            <div class="ribbon"></div>
+            <div class="gift-label">Abrir</div>
+          </div>
+        </div>
+        <div class="slide-desc">Haz clic en el regalo para descubrir la sorpresa final.</div>
+      </div>
+
+    </div>
+
+    <!-- dots -->
+    <div style="position:absolute; bottom:-10px; left:50%; transform:translateX(-50%);">
+      <div class="dots" id="dots"></div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div></div>
+  </footer>
+
+  <!-- MODAL / PRESENT -->
+  <div class="modal" id="modal">
+    <div class="present" role="dialog" aria-modal="true" aria-label="Sorpresa de cumpleaños">
+      <button class="close-btn" id="closeModal">✕</button>
+      <div class="greeting">¡Feliz Cumpleaños!</div>
+      <!-- Reemplaza final.jpg por la imagen definitiva que quieras mostrar -->
+      <img class="final-img" id="finalImg" src="images/final.jpg" alt="Feliz Cumpleaños">
+      <div style="font-size:14px; color:var(--muted);">Te amamos Luis. Gracias por ser parte de nuestras vidas 🎂.</div>
+    </div>
+  </div>
+
+  <!-- AUDIO: autoplay muted (intentamos desmutear en load) -->
+  <audio id="bgMusic" src="audio/music.mp3" loop autoplay muted></audio>
+
+  <script>
+    /* ---------- CAROUSEL LOGIC ---------- */
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const dotsContainer = document.getElementById('dots');
+    let current = 0;
+    const AUTO_MS = 15000; // tiempo entre slides
+    let autoplay = true;
+    let timer = null;
+
+    function createDots(){
+      slides.forEach((s,i)=>{
+        const d = document.createElement('div'); d.className='dot' + (i===0 ? ' active':'' );
+        d.dataset.index = i; d.addEventListener('click', ()=> goTo(i)); dotsContainer.appendChild(d);
+      })
+    }
+
+    function updateDots(){
+      const dots = Array.from(dotsContainer.children);
+      dots.forEach(d=>d.classList.toggle('active', Number(d.dataset.index)===current));
+    }
+
+    function show(index){
+      slides.forEach(s=>s.classList.remove('active'));
+      slides[index].classList.add('active');
+      current = index; updateDots();
+    }
+
+    function next(){
+      let nxt = (current + 1) % slides.length; show(nxt);
+    }
+    function prev(){
+      let prv = (current - 1 + slides.length) % slides.length; show(prv);
+    }
+    function goTo(i){ show(i); resetTimer(); }
+
+    function startTimer(){ stopTimer(); timer = setInterval(()=>{ if(autoplay) next(); }, AUTO_MS); }
+    function stopTimer(){ if(timer) clearInterval(timer); }
+    function resetTimer(){ stopTimer(); startTimer(); }
+
+    // pause when hovering slides
+    const slidesEl = document.getElementById('slides');
+    slidesEl.addEventListener('mouseenter', ()=> autoplay=false);
+    slidesEl.addEventListener('mouseleave', ()=> autoplay=true);
+
+    // arrows
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    prevBtn.addEventListener('click', ()=>{ prev(); autoplay=false; resetTimer(); });
+    nextBtn.addEventListener('click', ()=>{ next(); autoplay=false; resetTimer(); });
+
+    // keyboard support
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'ArrowLeft') { prev(); autoplay=false; resetTimer(); }
+      if(e.key === 'ArrowRight') { next(); autoplay=false; resetTimer(); }
+    });
+
+    createDots(); startTimer();
+
+    /* ---------- TOUCH / SWIPE SUPPORT (mobile) ---------- */
+    let touchStartX = 0; let touchEndX = 0;
+    slidesEl.addEventListener('touchstart', (e)=>{ touchStartX = e.changedTouches[0].screenX; autoplay=false; });
+    slidesEl.addEventListener('touchmove', (e)=>{ touchEndX = e.changedTouches[0].screenX; });
+    slidesEl.addEventListener('touchend', ()=>{ 
+      const diff = touchStartX - touchEndX;
+      if(Math.abs(diff) > 40){ if(diff > 0) { next(); } else { prev(); } }
+      autoplay=true; resetTimer();
+    });
+
+    /* ---------- MUTE / AUDIO CONTROL ---------- */
+    const audio = document.getElementById('bgMusic');
+    const muteBtn = document.getElementById('muteBtn');
+    const muteIcon = document.getElementById('muteIcon');
+    // audio element starts muted by attribute; we'll attempt to unmute on load
+    let isMuted = audio.muted;
+
+    // On load try to unmute and play (may be blocked by browser policy)
+    window.addEventListener('load', () => {
+      // try to unmute and play
+      audio.muted = false;
+      audio.play().then(()=> {
+        isMuted = false;
+        muteIcon.textContent = '🔊';
+      }).catch(()=> {
+        // autoplay blocked: keep muted but try to play (so it can be unmuted later)
+        audio.muted = true;
+        isMuted = true;
+        muteIcon.textContent = '🔈';
+        audio.play().catch(()=>{}); // might still fail silently
+      });
+    });
+
+    muteBtn.addEventListener('click', ()=>{
+      // Toggle mute; when unmuting, ensure play() is called so audio starts if allowed
+      isMuted = !isMuted;
+      audio.muted = isMuted;
+      muteIcon.textContent = isMuted ? '🔇' : '🔊';
+      if(!isMuted){
+        audio.play().catch(()=>{ /* If browser blocks, nothing más que hacer */ });
+      }
+    });
+
+    /* ---------- GIFT / MODAL ---------- */
+    const giftBtn = document.getElementById('giftBtn');
+    const modal = document.getElementById('modal');
+    const closeModal = document.getElementById('closeModal');
+
+    // stop click propagation on the gift box itself (avoid slide delegation interfering)
+    giftBtn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      openGift();
+    });
+
+    function openGift(){
+      autoplay = false;
+      modal.classList.add('show');
+      // try to ensure audio plays (or remain muted as chosen)
+      if(!audio.muted) audio.play().catch(()=>{});
+    }
+
+    closeModal.addEventListener('click', ()=>{
+      modal.classList.remove('show'); autoplay = true; resetTimer();
+    });
+
+    // close modal by clicking outside present
+    modal.addEventListener('click', (e)=>{ if(e.target===modal){ modal.classList.remove('show'); autoplay = true; resetTimer(); } });
+
+    // keyboard esc
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ if(modal.classList.contains('show')){ modal.classList.remove('show'); autoplay=true; resetTimer(); } } });
+
+    // Delegated click on slides container:
+    // - If user clicks a slide (not the gift) move to that slide
+    // - If the click target is inside the gift box, open the gift immediately (even if that slide wasn't active)
+    slidesEl.addEventListener('click', (e) => {
+      const slideEl = e.target.closest('.slide');
+      if(!slideEl) return;
+      const idx = Number(slideEl.dataset.index);
+      const clickedGift = e.target.closest('.gift-box');
+      if(clickedGift){
+        // open the gift immediately
+        openGift();
+        return;
+      }
+      if(idx !== current){
+        show(idx);
+      }
+    });
+
+    // ensure first slide visible on load
+    show(0);
+
+    /* ---------- NOTES for you ---------- */
+    // - Reemplaza las imágenes en folder "images/": photo1.jpg ... photo9.jpg y final.jpg (imagen grande final).
+    // - Reemplaza el audio en "audio/music.mp3" con la canción que prefieras.
+    // - Para probar localmente: guarda este archivo como "regalo.html" y abre en navegador.
+    // - Si el navegador bloquea el autoplay con sonido, la página intentará reproducir muteada; el botón superior izquierdo permite activar/desactivar el sonido fácilmente.
+  </script>
+</body>
+</html>
