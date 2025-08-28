@@ -162,6 +162,9 @@
       .arrow.left{left:4px}
       .arrow.right{right:4px}
       .mute-btn{width:48px;height:48px; left:8px; top:8px}
+
+      /* <-- AQUÍ: ocultar flechas en móviles para que solo swipe/touch funcione --> */
+      .arrow{display:none}
     }
 
     /* extra small phones (e.g., Xiaomi Note 10) */
@@ -171,6 +174,9 @@
       .slide-title{font-size:1.2rem}
       .greeting{font-size:1.6rem}
       .photo{max-height:220px}
+
+      /* redundante pero seguro: también ocultamos flechas en pantallas muy pequeñas */
+      .arrow{display:none}
     }
 
   </style>
@@ -228,8 +234,8 @@
       <div class="slide" data-index="2">
         <div class="slide-title">Es un Gran padre</div>
         <div class="photo-wrap"><img class="photo" src="images/photo3.jpg" alt="Foto 3"></div>
-        <div class="slide-desc">Probablemente la segunda persona que vieron en este mundo sus hijos (ó quizas la tercera despues del doctor 😅),
-          y desde entonces ha estado con ellos siempre que lo necesitan.
+        <div class="slide-desc">Probablemente la segunda persona que vieron en este mundo sus hijos (ó quizas tercera despues del doctor 😅),
+          y desde entonces a estado con ellos siempre que lo necesitan.
         </div>
       </div>
 
@@ -265,7 +271,7 @@
       <div class="slide" data-index="7">
         <div class="slide-title">Es un Hermano de Corazón </div>
         <div class="photo-wrap"><img class="photo" src="images/photo8.jpg" alt="Foto 8"></div>
-        <div class="slide-desc">Creció y vivio experiencias con todos ellos, tienen un lazo más allá
+        <div class="slide-desc">Creció y vivió experiencias con todos ellos, tienen un lazo más allá
           de la sangre que perdura hasta nuestros días.
         </div>
       </div>
