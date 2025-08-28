@@ -163,8 +163,11 @@
       .arrow.right{right:4px}
       .mute-btn{width:48px;height:48px; left:8px; top:8px}
 
-      /* <-- AQUÍ: ocultar flechas en móviles para que solo swipe/touch funcione --> */
+      /* ocultar flechas en móviles para que solo swipe/touch funcione */
       .arrow{display:none}
+
+      /* ocultar dots en móviles */
+      .dots{display:none}
     }
 
     /* extra small phones (e.g., Xiaomi Note 10) */
@@ -175,8 +178,9 @@
       .greeting{font-size:1.6rem}
       .photo{max-height:220px}
 
-      /* redundante pero seguro: también ocultamos flechas en pantallas muy pequeñas */
+      /* redundante pero seguro: también ocultamos flechas y dots en pantallas muy pequeñas */
       .arrow{display:none}
+      .dots{display:none}
     }
 
   </style>
@@ -220,7 +224,7 @@
       <div class="slide active" data-index="0">
         <div class="slide-title">¿Quien es?</div>
         <div class="photo-wrap"><img class="photo" src="images/photo1.jpg" alt="Foto 1"></div>
-        <div class="slide-desc">Él es Luis Fernando Cetares Laguna, actualmente tiene 55 años.</div>
+        <div class="slide-desc">Él es Luis Fernando Cetares Ruiz, actualmente tiene 55 años.</div>
       </div>
 
       <div class="slide" data-index="1">
@@ -242,7 +246,7 @@
       <div class="slide" data-index="3">
         <div class="slide-title">Es un Esposo Cariñoso</div>
         <div class="photo-wrap"><img class="photo" src="images/photo4.jpg" alt="Foto 4"></div>
-        <div class="slide-desc">3 veces distintas le costo invitar a la mujer de su vida a una cita,
+        <div class="slide-desc">3 veces distintas le costo invitar a la mujer de su vida para que sea su novia,
           y desde entonces ha sido una montaña rusa de emociones que ha durado hasta hoy.
         </div>
       </div>
@@ -271,7 +275,7 @@
       <div class="slide" data-index="7">
         <div class="slide-title">Es un Hermano de Corazón </div>
         <div class="photo-wrap"><img class="photo" src="images/photo8.jpg" alt="Foto 8"></div>
-        <div class="slide-desc">Creció y vivió experiencias con todos ellos, tienen un lazo más allá
+        <div class="slide-desc">Creció y vivio experiencias con todos ellos, tienen un lazo más allá
           de la sangre que perdura hasta nuestros días.
         </div>
       </div>
@@ -331,6 +335,7 @@
     const AUTO_MS = 15000; // tiempo entre slides
     let autoplay = true;
     let timer = null;
+    let awaitingOpen = false; // cuando llegamos al último slide, esperamos la siguiente acción para abrir
 
     function createDots(){
       slides.forEach((s,i)=>{
@@ -348,15 +353,39 @@
       slides.forEach(s=>s.classList.remove('active'));
       slides[index].classList.add('active');
       current = index; updateDots();
+
+      const lastIndex = slides.length - 1;
+      if(index === lastIndex){
+        // Al llegar al slide final, activamos el modo "esperar interacción".
+        awaitingOpen = true;
+      } else {
+        awaitingOpen = false;
+      }
     }
 
     function next(){
+      // si estamos en último slide y estamos en modo awaitingOpen, abrir regalo en vez de mover
+      const lastIndex = slides.length - 1;
+      if(current === lastIndex && awaitingOpen){
+        openGift(); awaitingOpen = false; return;
+      }
       let nxt = (current + 1) % slides.length; show(nxt);
     }
     function prev(){
+      const lastIndex = slides.length - 1;
+      if(current === lastIndex && awaitingOpen){
+        openGift(); awaitingOpen = false; return;
+      }
       let prv = (current - 1 + slides.length) % slides.length; show(prv);
     }
-    function goTo(i){ show(i); resetTimer(); }
+    function goTo(i){
+      const lastIndex = slides.length - 1;
+      // si estamos en ultimo y esperando, cualquier intento de cambiar de slide abre el regalo
+      if(current === lastIndex && awaitingOpen && i !== current){
+        openGift(); awaitingOpen = false; return;
+      }
+      show(i); resetTimer();
+    }
 
     function startTimer(){ stopTimer(); timer = setInterval(()=>{ if(autoplay) next(); }, AUTO_MS); }
     function stopTimer(){ if(timer) clearInterval(timer); }
@@ -385,9 +414,14 @@
     let touchStartX = 0; let touchEndX = 0;
     slidesEl.addEventListener('touchstart', (e)=>{ touchStartX = e.changedTouches[0].screenX; autoplay=false; });
     slidesEl.addEventListener('touchmove', (e)=>{ touchEndX = e.changedTouches[0].screenX; });
-    slidesEl.addEventListener('touchend', ()=>{ 
+    slidesEl.addEventListener('touchend', ()=>{
       const diff = touchStartX - touchEndX;
-      if(Math.abs(diff) > 40){ if(diff > 0) { next(); } else { prev(); } }
+      if(Math.abs(diff) > 40){
+        // si estamos en ultimo slide y esperando, abrir al intentar cambiar
+        const lastIndex = slides.length - 1;
+        if(current === lastIndex && awaitingOpen){ openGift(); awaitingOpen = false; return; }
+        if(diff > 0) { next(); } else { prev(); }
+      }
       autoplay=true; resetTimer();
     });
 
@@ -437,6 +471,7 @@
 
     function openGift(){
       autoplay = false;
+      awaitingOpen = false; // ya abrimos
       modal.classList.add('show');
       // try to ensure audio plays (or remain muted as chosen)
       if(!audio.muted) audio.play().catch(()=>{});
@@ -453,15 +488,21 @@
     document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ if(modal.classList.contains('show')){ modal.classList.remove('show'); autoplay=true; resetTimer(); } } });
 
     // Delegated click on slides container:
-    // - If user clicks a slide (not the gift) move to that slide
-    // - If the click target is inside the gift box, open the gift immediately (even if that slide wasn't active)
+    // - If user clicks the gift box, open it
+    // - If user clicks anywhere on the last slide while awaitingOpen, open gift
+    // - Otherwise, navigate to the clicked slide as before
     slidesEl.addEventListener('click', (e) => {
       const slideEl = e.target.closest('.slide');
       if(!slideEl) return;
       const idx = Number(slideEl.dataset.index);
       const clickedGift = e.target.closest('.gift-box');
+      const lastIndex = slides.length - 1;
       if(clickedGift){
-        // open the gift immediately
+        openGift();
+        return;
+      }
+      if(current === lastIndex && awaitingOpen){
+        // cualquier intento de interacción en el slide final después de llegar abre el regalo
         openGift();
         return;
       }
